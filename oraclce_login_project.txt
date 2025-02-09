@@ -2,7 +2,7 @@ login as: oracle
 oracle@192.168.56.105's password:
 Last login: Sun Feb  9 22:16:02 2025 from 192.168.56.1
 [oracle@aravindh ~]$
-[oracle@aravindh ~]$ # we need to give our user_name and password to login
+[oracle@aravindh ~]$ # we need to give our username and password to login
 [oracle@aravindh ~]$
 [oracle@aravindh ~]$ # Then we need to export our oracle sid
 [oracle@aravindh ~]$ export ORACLE_SID=orcl
@@ -25,9 +25,21 @@ Connected to an idle instance.
 SQL>
 SQL> -- Now we connected to our instance
 SQL> -- Next we need to start using one by one
-
 SQL>
-SQL> -- In this stage instance will get started and sapce allocations are given to SGA
+SQL> startup nomount
+ORACLE instance started.
+
+Total System Global Area 1560277408 bytes
+Fixed Size                  8896928 bytes
+Variable Size             922746880 bytes
+Database Buffers          620756992 bytes
+Redo Buffers                7876608 bytes
+SQL>
+SQL>
+SQL> -- In this Stage, Instance will read Parameter Files and Space will be allocated to SGA, then Instance will get Started
+SQL> -- Parameter Files are SPFILE and PFILE, They will have the Information of Instance
+SQL> -- PFILE will in text for us to read and modify
+SQL> -- SPFILE will be in byte code form, which will be easy for computer to read
 SQL> -- Let's deep dive into them
 SQL>
 SQL> -- Total System Global Area is SGA Total Size
@@ -37,3 +49,117 @@ SQL> -- Variable Size is Space allocated to Shared pool, Large pool, Java pool a
 SQL> -- Database Buffers is for Database Buffer Cache
 SQL> -- Redo Buffers is for Redo Log Buffer Cache
 SQL>
+SQL> -- Next we going to mount the Instance
+SQL>
+SQL> alter database mount;
+
+Database altered.
+
+SQL>
+SQL> -- In This stage control files are got allocated and DB will be mounted
+SQL> -- When the DB got mounted, all info of DB is read by instance through Control Files
+SQL>
+SQL> -- Next stage is open
+SQL>
+SQL> alter database open;
+
+Database altered.
+
+SQL> -- In this Stage, Instance will read Datafiles and Redo log Files
+SQL> -- Datafiles are the files which stores the actual data in database
+SQL> -- Redo log Files are the files which stores the change made in DB for Db recovery
+SQL>
+SQL> startup
+ORACLE instance started.
+
+Total System Global Area 1560277408 bytes
+Fixed Size                  8896928 bytes
+Variable Size             922746880 bytes
+Database Buffers          620756992 bytes
+Redo Buffers                7876608 bytes
+Database mounted.
+Database opened.
+SQL>
+SQL>
+SQL>
+SQL>
+SQL> -- Now we going to see about types of SHUTDOWN
+SQL> -- There are 4 types of SHUTDOWN
+SQL> --                        * SHUTDOWN NORMAL
+SQL> --                        * SHUTDOWN TRANSACTIONAL
+SQL> --                        * SHUTDOWN IMMEDIATE
+SQL> --                        * SHUTDOWN ABORT
+SQL>
+SQL> -- SHUTDOWN NORMAL : Waits for the users to disconnect
+SQL> -- SHUTDOWN TRANSACTIONAL : Completes uncommitted transactions before shutdown, doesn't wait for users to disconnect
+SQL> -- SHUTDOWN IMMEDIATE : Terminates transactions and disconnect users, waits for checkpoint
+SQL> -- SHUTDOWN ABORT : Immediate shutdown without waiting for transactions, users and checkpoint
+SQL>
+SQL>
+SQL>
+SQL> -- SHUTDOWN NORMAL
+SQL>
+SQL> shutdown normal
+Database closed.
+Database dismounted.
+ORACLE instance shut down.
+SQL>
+SQL>
+SQL>
+SQL> -- SHUTDOWN TRANSACTIONAL
+SQL>
+SQL> shutdown transactional
+Database closed.
+Database dismounted.
+ORACLE instance shut down.
+SQL>
+SQL>
+SQL>
+SQL> -- SHUTDOWN IMMEDIATE 
+SQL>
+SQL> shutdown immediate
+Database closed.
+Database dismounted.
+ORACLE instance shut down.
+SQL>
+SQL>
+SQL>
+SQL> -- SHUTDOWN ABORT
+SQL>
+SQL> shutdown abort
+ORACLE instance shut down.
+SQL>
+SQL>
+SQL>
+SQL>
+SQL>
+SQL> -- In this Project we learned from login to shutdown in Oracle Database
+SQL> --
+SQL> --
+SQL> -- Things we Learned
+SQL> --               * Login
+SQL> --               * Oracle Sid setup
+SQL> --               * Sqlplus Utility allocation with Super User and Privilege
+SQL> --               * Startup and Shutdown Procedures
+SQL> --
+SQL> -- Once Again There are 3 Stages in Startup
+SQL> --                                      * No Mount
+SQL> --                                      * Mount
+SQL> --                                      * Open
+SQL> --
+SQL> -- There are Four types of Shutdown Procedures
+SQL> --                                      * Shutdown Normal
+SQL> --                                      * Shutdown Transactional
+SQL> --                                      * Shutdown Immediate
+SQL> --                                      * Shutdown Abort
+SQL> --
+SQL> --
+SQL> --
+SQL> --
+SQL> -- Thanks for having a look at my work
+SQL> -- Thankyou so much :)
+SQL> -- Thanks :)
+SQL> --
+SQL> --
+SQL> --
+SQL> --
