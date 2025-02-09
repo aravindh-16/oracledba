@@ -1,0 +1,39 @@
+login as: oracle
+oracle@192.168.56.105's password:
+Last login: Sun Feb  9 22:16:02 2025 from 192.168.56.1
+[oracle@aravindh ~]$
+[oracle@aravindh ~]$ # we need to give our user_name and password to login
+[oracle@aravindh ~]$
+[oracle@aravindh ~]$ # Then we need to export our oracle sid
+[oracle@aravindh ~]$ export ORACLE_SID=orcl
+[oracle@aravindh ~]$
+[oracle@aravindh ~]$ # To cross verify it we are going to check our SID by echo
+[oracle@aravindh ~]$ echo $ORACLE_SID
+orcl
+[oracle@aravindh ~]$
+[oracle@aravindh ~]$ # Now we are going to log SQlPLUS using / and SYSDBA
+[oracle@aravindh ~]$ # Here / is Super User and SYDBA is Administartion Previlege
+[oracle@aravindh ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Sun Feb 9 22:24:48 2025
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL>
+SQL> -- Now we connected to our instance
+SQL> -- Next we need to start using one by one
+
+SQL>
+SQL> -- In this stage instance will get started and sapce allocations are given to SGA
+SQL> -- Let's deep dive into them
+SQL>
+SQL> -- Total System Global Area is SGA Total Size
+SQL> -- Fixed Size is Space allocated to store Instance Information and for Background Processes
+SQL> -- Fixed Size <= 2% of Total SGA Size
+SQL> -- Variable Size is Space allocated to Shared pool, Large pool, Java pool and Streams pool
+SQL> -- Database Buffers is for Database Buffer Cache
+SQL> -- Redo Buffers is for Redo Log Buffer Cache
+SQL>
