@@ -1,0 +1,450 @@
+
+SQL> -- In this Project We are going to Create Tablespace, Table, Constraints, Index, Joins, etc...
+SQL>
+SQL> -- First we are going to create a Tablespace
+SQL> -- Tablespace is the largest logical storage structure in Oracle Database
+SQL>
+SQL> -- To know what are the Tablespaces in Oracle we do the below Query
+SQL>
+SQL> select name from v$tablespace;
+
+NAME
+------------------------------
+SYSAUX
+SYSTEM
+UNDOTBS1
+USERS
+TEMP
+
+SQL>
+SQL> -- To create Tablespace we need to mention their name, datafile and it's size
+SQL> -- to know the datafile, we need to do the below Query
+SQL>
+SQL> select name from v$datafile;
+
+NAME
+--------------------------------------------------------------------------------
+/u01/app/oracle/oradata/ORCL/system01.dbf
+/u01/app/oracle/oradata/ORCL/sysaux01.dbf
+/u01/app/oracle/oradata/ORCL/undotbs01.dbf
+/u01/app/oracle/oradata/ORCL/users01.dbf
+
+SQL>
+SQL> select name from v$tablespace;
+
+NAME
+------------------------------
+SYSAUX
+SYSTEM
+UNDOTBS1
+USERS
+TEMP
+
+SQL>
+SQL>
+SQL>
+SQL> -- Now we are going to create tablespace
+SQL>
+SQL> create tablespace SCHOOL
+  2  datafile '/u01/app/oracle/oradata/ORCL/school01.dbf' size 100M;
+
+Tablespace created.
+
+SQL>
+SQL> -- Now we are going to Cross Check the newly created tablespace by below Query
+SQL>
+SQL> select name from v$tablespace;
+
+NAME
+------------------------------
+SYSAUX
+SYSTEM
+UNDOTBS1
+USERS
+TEMP
+SCHOOL
+
+6 rows selected.
+
+SQL>
+SQL> -- We can see that our newly Created Tablespace by using the above Query
+SQL>
+SQL>
+SQL>
+SQL> -- Now we are going to create a school table and assign it to School tablespace which is created above
+SQL>
+SQL> create table school(
+  2  sno number(4),
+  3  name varchar2(25),
+  4  age number(2),
+  5  gender char(6),
+  6  dob date,
+  7  parent varchar2(25),
+  8  phone char(10))
+  9  tablespace school;
+
+Table created.
+
+SQL>
+SQL>
+SQL> -- To check whether table is created or not, we need to cross verify by below Query
+SQL>
+SQL>
+SQL> select table_name, tablespace_name from dba_tables where table_name='SCHOOL';
+
+TABLE_NAME
+----------------------------------------
+TABLESPACE_NAME
+------------------------------
+SCHOOL
+SCHOOL
+
+
+SQL>
+SQL>
+SQL>  -- change the datatype of column
+SQL>
+SQL> alter table school modify gender varchar2(6);
+
+Table altered.
+
+SQL>
+SQL>
+SQL> -- Now we are going to give constraints to the column of the school table
+SQL>
+SQL>
+SQL> alter table school add constraint school_sno_pk primary key(sno);
+
+Table altered.
+
+SQL>
+SQL> desc school
+ Name              Null?    Type
+ ----------------- -------- ------------
+ SNO               NOT NULL NUMBER(4)
+ NAME                       VARCHAR2(25)
+ AGE                        NUMBER(2)
+ GENDER                     VARCHAR2(6)
+ DOB                        DATE
+ PARENT                     VARCHAR2(25)
+ PHONE                      CHAR(10)
+
+SQL>
+SQL> alter table school modify name not null;
+
+Table altered.
+
+SQL>
+SQL>  alter table school modify age not null;
+
+Table altered.
+
+SQL>
+SQL> alter table school add constraint school_gender_check check ( gender in ('male','female'));
+
+Table altered.
+
+SQL>
+SQL>
+SQL> alter table school modify dob not null;
+
+Table altered.
+
+SQL>
+SQL> alter table school modify parent not null;
+
+Table altered.
+
+SQL>
+SQL>
+SQL> alter table school add constraint school_phone_uq unique(phone);
+
+Table altered.
+
+SQL>
+SQL>
+SQL> alter table school modify gender not null;
+
+Table altered.
+
+SQL> alter table school modify phone not null;
+
+Table altered.
+
+SQL>
+SQL>
+SQL>
+SQL> desc school
+ Name              Null?    Type
+ ----------------- -------- ------------
+ SNO               NOT NULL NUMBER(4)
+ NAME              NOT NULL VARCHAR2(25)
+ AGE               NOT NULL NUMBER(2)
+ GENDER            NOT NULL VARCHAR2(6)
+ DOB               NOT NULL DATE
+ PARENT            NOT NULL VARCHAR2(25)
+ PHONE             NOT NULL CHAR(10)
+
+SQL>
+SQL>
+SQL>
+SQL> insert into school values ( &sno, '&name', &age, '&gender', '&dob', '&parent', '&phone');
+Enter value for sno: 1
+Enter value for name: Akash
+Enter value for age: 23
+Enter value for gender: male
+Enter value for dob: 17-jan-2002
+Enter value for parent: Udayappa
+Enter value for phone: 8709652427
+old   1: insert into school values ( &sno, '&name', &age, '&gender', '&dob', '&parent', '&phone')
+new   1: insert into school values ( 1, 'Akash', 23, 'male', '17-jan-2002', 'Udayappa', '8709652427')
+
+1 row created.
+
+SQL> /
+Enter value for sno: 2
+Enter value for name: Akashaya
+Enter value for age: 23
+Enter value for gender: female
+Enter value for dob: 24-jun-2002
+Enter value for parent: Raja Sheaker
+Enter value for phone: 7923452784
+old   1: insert into school values ( &sno, '&name', &age, '&gender', '&dob', '&parent', '&phone')
+new   1: insert into school values ( 2, 'Akashaya', 23, 'female', '24-jun-2002', 'Raja Sheaker', '7923452784')
+
+1 row created.
+
+SQL> /
+Enter value for sno: 3
+Enter value for name: Bala
+Enter value for age: 22
+Enter value for gender: male
+Enter value for dob: 21-feb-2003
+Enter value for parent: Mani
+Enter value for phone: 6354735623
+old   1: insert into school values ( &sno, '&name', &age, '&gender', '&dob', '&parent', '&phone')
+new   1: insert into school values ( 3, 'Bala', 22, 'male', '21-feb-2003', 'Mani', '6354735623')
+
+1 row created.
+
+SQL> /
+Enter value for sno: 4
+Enter value for name: Kanmani
+Enter value for age: 22
+Enter value for gender: female
+Enter value for dob: 07-aug-2003
+Enter value for parent: Rajesh
+Enter value for phone: 8497356422
+old   1: insert into school values ( &sno, '&name', &age, '&gender', '&dob', '&parent', '&phone')
+new   1: insert into school values ( 4, 'Kanmani', 22, 'female', '07-aug-2003', 'Rajesh', '8497356422')
+
+1 row created.
+
+SQL> /
+Enter value for sno: 5
+Enter value for name: Ram
+Enter value for age: 22
+Enter value for gender: male
+Enter value for dob: 12-feb-2003
+Enter value for parent: Kumar
+Enter value for phone: 8745903245
+old   1: insert into school values ( &sno, '&name', &age, '&gender', '&dob', '&parent', '&phone')
+new   1: insert into school values ( 5, 'Ram', 22, 'male', '12-feb-2003', 'Kumar', '8745903245')
+
+1 row created.
+
+SQL>
+SQL>
+SQL>
+SQL>  select * from school;
+
+       SNO NAME              AGE GENDER DOB       PARENT                    PHONE
+---------- ---------- ---------- ------ --------- ------------------------- ----------
+         1 Akash              23 male   17-JAN-02 Udayappa                  8709652427
+         2 Akashaya           23 female 24-JUN-02 Raja Sheaker              7923452784
+         3 Bala               22 male   21-FEB-03 Mani                      6354735623
+         4 Kanmani            22 female 07-AUG-03 Rajesh                    8497356422
+         5 Ram                22 male   12-FEB-03 Kumar                     8745903245
+
+SQL>
+SQL>
+SQL> -- Now we are going to add a row and join it to another table
+SQL>
+SQL> alter table school add  dno number(3) constraint school_dno_uq unique;
+
+Table altered.
+
+SQL>
+SQL> -- Creating another table for joining using foreign key
+SQL>
+SQL> create table department (
+  2  dno number(3) constraint department_dno_pk primary key,
+  3  dep_name varchar2(12) constraint department_dno_uq unique
+  4  ) tablespace school;
+
+Table created.
+
+SQL>
+SQL>
+SQL> alter table school add constraint school_dep_fk foreign key(dno) references department(dno);
+
+Table altered.
+
+SQL>
+SQL> -- Now both school and department table dno column are in relation
+SQL>
+SQL> insert into department values( &dno, '&dep_name');
+Enter value for dno: 101
+Enter value for dep_name: biology
+old   1: insert into department values( &dno, '&dep_name')
+new   1: insert into department values( 101, 'biology')
+
+1 row created.
+
+SQL> /
+Enter value for dno: 102
+Enter value for dep_name: computer
+old   1: insert into department values( &dno, '&dep_name')
+new   1: insert into department values( 102, 'computer')
+
+1 row created.
+
+SQL> /
+Enter value for dno: 103
+Enter value for dep_name: comerece
+old   1: insert into department values( &dno, '&dep_name')
+new   1: insert into department values( 103, 'comerece')
+
+1 row created.
+
+SQL>
+SQL> select * from department;
+
+       DNO DEP_NAME
+---------- ------------
+       101 biology
+       102 computer
+       103 commerce
+
+SQL>
+SQL> select * from school;
+
+       SNO NAME              AGE GENDER DOB       PARENT                    PHONE             DNO
+---------- ---------- ---------- ------ --------- ------------------------- ---------- ----------
+         1 Akash              23 male   17-JAN-02 Udayappa                  8709652427
+         2 Akashaya           23 female 24-JUN-02 Raja Sheaker              7923452784
+         3 Bala               22 male   21-FEB-03 Mani                      6354735623
+         4 Kanmani            22 female 07-AUG-03 Rajesh                    8497356422
+         5 Ram                22 male   12-FEB-03 Kumar                     8745903245
+
+SQL>
+SQL> -- Let's update DNO column in  School Table
+SQL>
+SQL>
+SQL> update school set DNO=103 where SNO in (2,4);
+
+2 rows updated.
+
+SQL>
+SQL>
+SQL>
+SQL> select * from school;
+
+       SNO NAME              AGE GENDER DOB       PARENT                    PHONE             DNO
+---------- ---------- ---------- ------ --------- ------------------------- ---------- ----------
+         1 Akash              23 male   17-JAN-02 Udayappa                  8709652427
+         2 Akashaya           23 female 24-JUN-02 Raja Sheaker              7923452784        103
+         3 Bala               22 male   21-FEB-03 Mani                      6354735623
+         4 Kanmani            22 female 07-AUG-03 Rajesh                    8497356422        103
+         5 Ram                22 male   12-FEB-03 Kumar                     8745903245
+
+SQL> select * from department;
+
+       DNO DEP_NAME
+---------- ------------
+       101 biology
+       102 computer
+       103 commerce
+
+SQL>
+SQL> update school set DNO=102 where SNO=3;
+
+1 row updated.
+
+SQL> update school set DNO=101 where SNO in (1,5);
+
+2 rows updated.
+
+SQL>
+SQL>
+SQL>
+SQL> select * from school;
+
+       SNO NAME              AGE GENDER DOB       PARENT                    PHONE             DNO
+---------- ---------- ---------- ------ --------- ------------------------- ---------- ----------
+         1 Akash              23 male   17-JAN-02 Udayappa                  8709652427        101
+         2 Akashaya           23 female 24-JUN-02 Raja Sheaker              7923452784        103
+         3 Bala               22 male   21-FEB-03 Mani                      6354735623        102
+         4 Kanmani            22 female 07-AUG-03 Rajesh                    8497356422        103
+         5 Ram                22 male   12-FEB-03 Kumar                     8745903245        101
+
+SQL> select * from department;
+
+       DNO DEP_NAME
+---------- ------------
+       101 biology
+       102 computer
+       103 commerce
+
+SQL>
+SQL>
+SQL> select s.name, s.age, s.parent, d.dep_name
+  2  from school s join department d
+  3  on s.dno=d.dno;
+
+NAME              AGE PARENT                    DEP_NAME
+---------- ---------- ------------------------- ------------
+Akash              23 Udayappa                  biology
+Akashaya           23 Raja Sheaker              commerce
+Bala               22 Mani                      computer
+Kanmani            22 Rajesh                    commerce
+Ram                22 Kumar                     biology
+
+SQL> select s.sno, s.name, s.age, s.parent, d.dep_name
+  2  from school s join department d on s.dno=d.dno;
+
+       SNO NAME              AGE PARENT                    DEP_NAME
+---------- ---------- ---------- ------------------------- ------------
+         1 Akash              23 Udayappa                  biology
+         2 Akashaya           23 Raja Sheaker              commerce
+         3 Bala               22 Mani                      computer
+         4 Kanmani            22 Rajesh                    commerce
+         5 Ram                22 Kumar                     biology
+
+SQL>
+SQL>
+SQL> -- Now we are going to index to the table to improve the query performance in a specific column
+SQL>
+SQL> create index school_name on school(name);
+
+Index created.
+
+SQL>
+SQL> create index school_dob_phone on school(dob,phone);
+
+Index created.
+
+SQL>
+SQL>
+SQL>
+SQL>
+SQL>
+SQL> -- In This Project we learned about,
+SQL> --                         * How to create tablespace
+SQL> --                         * How to create table and assign to specific tablespace
+SQL> --                         * How to insert and update a table
+SQL> --                         * How to add constraints to a table
+SQL> --                         * How to add Foreign key and join two table
+SQL> --                         * How to add index to a specific row of a table
+SQL>
+SQL>
