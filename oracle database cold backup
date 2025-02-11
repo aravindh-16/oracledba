@@ -1,0 +1,257 @@
+
+-- In this project, In going to perform cold backup and restore it, by simulating a failure.
+
+[oracle@aravindh ~]$ cd /backup/cold_backup/orcl
+[oracle@aravindh orcl]$ ls
+controlfile  datafile  logfile  parameter
+
+-- /backup/cold_backup/orcl -> This is My Backup Location
+
+
+-- Lets see the location of OS files
+
+[oracle@aravindh ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Tue Feb 11 20:11:30 2025
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> startup
+ORACLE instance started.
+
+Total System Global Area 1560277408 bytes
+Fixed Size                  8896928 bytes
+Variable Size             922746880 bytes
+Database Buffers          620756992 bytes
+Redo Buffers                7876608 bytes
+Database mounted.
+Database opened.
+SQL>
+SQL> select name from v$datafile;
+
+NAME
+--------------------------------------------------------------------------------
+/u01/app/oracle/oradata/ORCL/system01.dbf
+/u01/app/oracle/oradata/ORCL/sysaux01.dbf
+/u01/app/oracle/oradata/ORCL/undotbs01.dbf
+/u01/app/oracle/oradata/ORCL/school01.dbf
+/u01/app/oracle/oradata/ORCL/users01.dbf
+
+SQL> select name from v$controlfile;
+
+NAME
+--------------------------------------------------------------------------------
+/u01/app/oracle/oradata/ORCL/control01.ctl
+/u01/app/oracle/fast_recovery_area/ORCL/control02.ctl
+
+SQL> select member from v$logfile;
+
+MEMBER
+--------------------------------------------------------------------------------
+/u01/app/oracle/oradata/ORCL/redo03.log
+/u01/app/oracle/oradata/ORCL/redo02.log
+/u01/app/oracle/oradata/ORCL/redo01.log
+
+SQL> create pfile='/backup/cold_backup/orcl/parameter/initorcl.ora' from spfile;
+
+File created.
+
+SQL>
+
+-- We got location of all file, next we need to shutdown DB and take backup
+
+[oracle@aravindh ~]$ cd /u01/app/oracle/oradata/ORCL/
+[oracle@aravindh ORCL]$ ls
+control01.ctl  redo02.log  school01.dbf  system01.dbf  undotbs01.dbf
+redo01.log     redo03.log  sysaux01.dbf  temp01.dbf    users01.dbf
+[oracle@aravindh ORCL]$ cp *dbf /backup/cold_backup/orcl/datafile/
+[oracle@aravindh ORCL]$ cp *log /backup/cold_backup/orcl/logfile/
+[oracle@aravindh ORCL]$ cp control01.ctl /backup/cold_backup/orcl/controlfile/
+[oracle@aravindh ORCL]$ cd /u01/app/oracle/fast_recovery_area/ORCL/
+[oracle@aravindh ORCL]$ ls
+archivelog  control02.ctl  onlinelog
+[oracle@aravindh ORCL]$ cp control02.ctl /backup/cold_backup/orcl/controlfile/
+[oracle@aravindh ORCL]$
+[oracle@aravindh ORCL]$ cd /backup/cold_backup/orcl/
+[oracle@aravindh orcl]$ ls
+controlfile  datafile  logfile  parameter
+[oracle@aravindh orcl]$ cd controlfile
+[oracle@aravindh controlfile]$ ls
+control01.ctl  control02.ctl
+[oracle@aravindh controlfile]$
+[oracle@aravindh controlfile]$ cd ../datafile/
+[oracle@aravindh datafile]$ ls
+school01.dbf  sysaux01.dbf  system01.dbf  temp01.dbf  undotbs01.dbf  users01.dbf
+[oracle@aravindh datafile]$
+[oracle@aravindh datafile]$ cd ../logfile/
+[oracle@aravindh logfile]$ ls
+redo01.log  redo02.log  redo03.log
+[oracle@aravindh logfile]$
+[oracle@aravindh logfile]$ cd ../parameter/
+[oracle@aravindh parameter]$ ls
+initorcl.ora
+[oracle@aravindh parameter]$
+
+
+
+-- Now we have the Backup of Data Files, Control Files, Redo Logfiles and Parameter File (pfile)
+
+-- Parameter File   -->	/backup/cold_backup/orcl/parameter/initorcl.ora
+-- Control Files    -->	/backup/cold_backup/orcl/controlfile/*
+-- Data Files 	    -->	/backup/cold_backup/orcl/datafile/*
+-- Redo Log Files   -->	/backup/cold_backup/orcl/logfile/*
+
+-- Lets simulate a Failure
+
+[oracle@aravindh ~]$
+[oracle@aravindh ~]$
+[oracle@aravindh ~]$ cd $ORACLE_HOME/dbs
+[oracle@aravindh dbs]$ ls
+hc_orcl.dat  init.ora  initorcl.ora  lkORCL  orapworcl  spfileorcl.ora
+[oracle@aravindh dbs]$ rm initorcl.ora spfileorcl.ora
+[oracle@aravindh dbs]$ ls
+hc_orcl.dat  init.ora  lkORCL  orapworcl
+[oracle@aravindh dbs]$
+[oracle@aravindh dbs]$ cd $ORACLE_BASE/oradata/ORCL
+[oracle@aravindh ORCL]$ ls
+control01.ctl  redo02.log  school01.dbf  system01.dbf  undotbs01.dbf
+redo01.log     redo03.log  sysaux01.dbf  temp01.dbf    users01.dbf
+[oracle@aravindh ORCL]$ rm *
+[oracle@aravindh ORCL]$
+[oracle@aravindh ORCL]$ cd $ORACLE_BASE/fast_recovery_area/ORCL/
+[oracle@aravindh ORCL]$ ls
+archivelog  control02.ctl  onlinelog
+[oracle@aravindh ORCL]$ rm control02.ctl
+[oracle@aravindh ORCL]$
+[oracle@aravindh ORCL]$ cd
+[oracle@aravindh ~]$
+[oracle@aravindh ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Tue Feb 11 20:33:06 2025
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> startup
+ORA-01078: failure in processing system parameters
+LRM-00109: could not open parameter file '/u01/app/oracle/product/19.0.0/dbhome_1/dbs/initorcl.ora'
+SQL>
+
+-- DB won't go to No Mount State without Parameter File
+-- Let's start it with our backup
+
+SQL> startup pfile='/backup/cold_backup/orcl/parameter/initorcl.ora' nomount
+ORACLE instance started.
+
+Total System Global Area 1560277408 bytes
+Fixed Size                  8896928 bytes
+Variable Size             922746880 bytes
+Database Buffers          620756992 bytes
+Redo Buffers                7876608 bytes
+SQL>
+
+-- We just started using our backup but we didn't restored it, so we need restore it back
+
+SQL> ! cp /backup/cold_backup/orcl/parameter/initorcl.ora /u01/app/oracle/product/19.0.0/dbhome_1/dbs/initorcl.ora
+
+SQL>  create spfile from pfile;
+
+File created.
+
+SQL>
+
+
+-- We done with the restoration  of  parameter files
+-- Next we try to mount DB
+
+SQL> alter database mount;
+alter database mount
+*
+ERROR at line 1:
+ORA-00205: error in identifying control file, check alert log for more info
+
+
+SQL>
+
+
+-- Let's recover control files
+
+SQL>
+SQL> !
+[oracle@aravindh ~]$ cp /backup/cold_backup/orcl/controlfile/control01.ctl $ORACLE_BASE/oradata/ORCL/
+[oracle@aravindh ~]$ cp /backup/cold_backup/orcl/controlfile/control02.ctl /u01/app/oracle/fast_recovery_area/ORCL/
+[oracle@aravindh ~]$
+[oracle@aravindh ~]$ exit
+exit
+
+SQL> alter database mount;
+
+Database altered.
+
+SQL>
+
+-- Let's open our DB
+
+SQL> alter database open;
+alter database open
+*
+ERROR at line 1:
+ORA-01157: cannot identify/lock data file 1 - see DBWR trace file
+ORA-01110: data file 1: '/u01/app/oracle/oradata/ORCL/system01.dbf'
+
+
+SQL>
+
+
+-- We cannot able to open our DB
+-- Let's restore our Datafiles and Redologfiles
+
+SQL>
+SQL> ! cp /backup/cold_backup/orcl/datafile/* /u01/app/oracle/oradata/ORCL/
+
+SQL> ! cp /backup/cold_backup/orcl/logfile/* /u01/app/oracle/oradata/ORCL/
+
+SQL>
+
+-- Done, Let's Open it
+
+SQL>
+SQL> alter database open;
+
+Database altered.
+
+SQL>
+
+
+-- Once again, let's check by restarting DB
+
+SQL>
+SQL> shutdown immediate
+Database closed.
+Database dismounted.
+ORACLE instance shut down.
+SQL>
+SQL> startup
+ORACLE instance started.
+
+Total System Global Area 1560277408 bytes
+Fixed Size                  8896928 bytes
+Variable Size             922746880 bytes
+Database Buffers          620756992 bytes
+Redo Buffers                7876608 bytes
+Database mounted.
+Database opened.
+SQL>
+SQL>
+
+
+-- Everything thing is alright
+-- We have successfully done backup & restore by using cold backup method in Oracle Database
+
+
+				Thank You for Having a Look :)
